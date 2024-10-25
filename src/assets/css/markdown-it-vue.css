@@ -1,0 +1,122 @@
+.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 5px;
+    color: #383a42;
+    background: #fafafa
+}
+
+.hljs-header {
+    background: #f0f0f0;
+    height: 20px;
+}
+
+.hljs-header label {
+    text-size-adjust: 100%;
+    margin: 5px;
+    font-weight: 30;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.hljs-comment, .hljs-quote {
+    color: #a0a1a7;
+    font-style: italic
+}
+
+.hljs-doctag, .hljs-formula, .hljs-keyword {
+    color: #a626a4
+}
+
+.hljs-deletion, .hljs-name, .hljs-section, .hljs-selector-tag, .hljs-subst {
+    color: #e45649
+}
+
+.hljs-literal {
+    color: #0184bb
+}
+
+.hljs-addition, .hljs-attribute, .hljs-meta-string, .hljs-regexp, .hljs-string {
+    color: #50a14f
+}
+
+.hljs-built_in, .hljs-class .hljs-title {
+    color: #c18401
+}
+
+.hljs-attr, .hljs-number, .hljs-selector-attr, .hljs-selector-class, .hljs-selector-pseudo, .hljs-template-variable, .hljs-type, .hljs-variable {
+    color: #986801
+}
+
+.hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-symbol, .hljs-title {
+    color: #4078f2
+}
+
+.hljs-emphasis {
+    font-style: italic
+}
+
+.hljs-strong {
+    font-weight: 700
+}
+
+.hljs-link {
+    text-decoration: underline
+}
+
+.code-copy-btn {
+    border: none;
+    background: none;
+    height: 16px;
+    width: 16px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+
+.code-copy-icon {
+    height: 16px;
+    width: 16px;
+    margin: 0;
+    padding: 0;
+}
+
+.code-copy-icon svg {
+    height: 12px;
+    width: 12px;
+}
+
+.code-copy-icon svg:hover {
+    height: 14px;
+    width: 14px;
+}
+
+.markdown-body p {
+    margin: 0;
+}
+
+.markdown-body table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.markdown-body table th {
+    font-weight: 600
+}
+
+.markdown-body table td, .markdown-body table th {
+    padding: 6px 13px;
+    border: 1px solid #dfe2e5
+}
+
+.markdown-body table tr {
+    background-color: #fff;
+    border-top: 1px solid #c6cbd1
+}
+
+.markdown-body table tr:nth-child(2n) {
+    background-color: #f6f8fa
+}
+
