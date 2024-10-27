@@ -1,6 +1,5 @@
 <script>
 import {mapGetters, mapMutations, mapState} from "vuex";
-import PubSub from "pubsub-js";
 
 export default {
   name: "RecordItem",
@@ -16,11 +15,19 @@ export default {
     ...mapGetters('globalInfo', ['isInputting']),
     ...mapState('accountInfo', {
       accountId: state => state.id,
-    })
+    }),
+
+    isSelected() {
+      return this.$route.params.chatId === this.record.id
+    },
+
+    selectedStyle() {
+      return {backgroundColor: this.isSelected ? '#e0e0e0' : '#f5f5f5'}
+    }
   },
 
   methods: {
-    ...mapMutations('chatRecordDirectory', ['selectChatRecord', 'deleteChatRecord']),
+    ...mapMutations('chatRecordDirectory', ['deleteChatRecord']),
 
     formDate(timestamp) {
       const date = new Date(timestamp);
@@ -35,10 +42,13 @@ export default {
     },
 
     selectRecord(id) {
-      if (this.isInputting) {
-        // todo: 将pubsub替换成router的形式
-        PubSub.publish('selectRecordEvent', id)
-        this.selectChatRecord(id);
+      if (this.isInputting && !this.isSelected) {
+        this.$router.push({
+          name: 'chat',
+          params: {
+            chatId: id,
+          }
+        });
       }
     },
 
@@ -48,6 +58,10 @@ export default {
           chatId: id,
           accountId: this.accountId
         })
+
+        if (this.isSelected) {
+          this.$router.push('/');
+        }
       }
     }
   },
@@ -65,7 +79,7 @@ export default {
         @mouseover="showRecordOptionBtn=true"
         @mouseout="showRecordOptionBtn=false"
         @click="selectRecord(record.id)"
-        :style="{backgroundColor: record.isSelected? '#e0e0e0': '#f5f5f5'}"
+        :style="selectedStyle"
     >
       <span class="record-msg">
         {{ record.latestMsg }}

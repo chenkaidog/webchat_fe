@@ -1,7 +1,8 @@
 <script>
-import HeaderAccount from "./HeaderAccount.vue";
-import HeaderModel from "./HeaderModel.vue";
+import HeaderAccount from "@/pages/chat/content/HeaderAccount.vue";
+import HeaderModel from "@/pages/chat/content/HeaderModel.vue";
 import {mapActions, mapGetters, mapState} from "vuex";
+import {v4 as uuidv4} from "uuid";
 
 export default {
   name: "ContentHeader",
@@ -21,7 +22,12 @@ export default {
 
     createNewConversation() {
       if (this.isInputting) {
-        // todo: 创建新对话
+        this.$router.push({
+          name: 'chat',
+          params: {
+            chatId: uuidv4(),
+          }
+        });
       }
     },
   }

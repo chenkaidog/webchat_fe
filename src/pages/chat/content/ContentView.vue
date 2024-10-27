@@ -1,8 +1,9 @@
 <script>
-import MarkdownIt from './MarkdownIt.vue'
+import MarkdownIt from '@/pages/chat/content/MarkdownIt.vue'
 import PubSub from "pubsub-js";
 import {storeChatRecord, getChatRecord} from '@/assets/js/content'
 import {mapMutations, mapState} from "vuex";
+import {v4 as uuidv4} from "uuid";
 
 export default {
   name: "ContentView",
@@ -11,7 +12,6 @@ export default {
   },
   data() {
     return {
-      currentChatId: Date.now().toString(), // 初始ID
       chatRecords: [],
       fixToBottom: true,
     }
@@ -19,16 +19,36 @@ export default {
 
   computed: {
     ...mapState('accountInfo', {
+      isLogin: state => state.isLogin,
       accountId: state => state.id,
-    })
+    }),
+
+    currentChatId() {
+      let chatId = this.$route.params.chatId;
+      if (chatId) {
+        return chatId
+      }
+
+      return uuidv4();
+    }
+  },
+
+  watch: {
+    currentChatId(newId) {
+      this.selectRecord(newId)
+    },
+    isLogin(login) {
+      if (!login) {
+        this.chatRecords = [];
+      }
+    },
   },
 
   methods: {
     ...mapMutations('chatRecordDirectory', ['appendChatRecord']),
 
-    handleSelectRecordEvent(_, chatId) {
-      this.currentChatId = chatId
-      this.chatRecords = getChatRecord(chatId)
+    selectRecord(chatId) {
+      this.chatRecords = getChatRecord(this.accountId, chatId) || []
       this.scrollToBottom()
     },
 
@@ -43,7 +63,7 @@ export default {
             msg: this.chatRecords[n - 1].assistant
           })
 
-          storeChatRecord(this.currentChatId, this.chatRecords)
+          storeChatRecord(this.accountId, this.currentChatId, this.chatRecords)
           return
         }
         this.chatRecords[n - 1].assistant = respMsg
@@ -54,9 +74,15 @@ export default {
     },
 
     handleAppendChatEvent(_, chatItem) {
+      if (this.$route.params.chatId !== this.currentChatId) {
+        this.$router.replace({
+          name: 'chat',
+          params: {chatId: this.currentChatId}
+        })
+      }
       // 用户成功触发一次请求
       this.chatRecords.push(chatItem)
-      this.fixToBottom=true
+      this.fixToBottom = true
       this.scrollToBottom()
     },
 
@@ -68,14 +94,15 @@ export default {
   },
 
   created() {
-    this.selectRecordEvent = PubSub.subscribe('selectRecordEvent', this.handleSelectRecordEvent)
     this.appendChatEvent = PubSub.subscribe('appendChatEvent', this.handleAppendChatEvent)
     this.assisantRespEvent = PubSub.subscribe('assistantRespEvent', this.handleAssistantRespEvent)
   },
   beforeDestroy() {
-    PubSub.unsubscribe(this.selectRecordEvent)
     PubSub.unsubscribe(this.assisantRespEvent)
     PubSub.unsubscribe(this.appendChatEvent)
+  },
+  mounted() {
+    this.selectRecord(this.currentChatId);
   },
 }
 </script>

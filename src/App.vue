@@ -1,45 +1,22 @@
 <template>
-  <div id="app" :style="appStyle">
-    <NavigatorBar class="navigator" v-show="navigatorFlag"/>
-    <MainContent class="main-content"/>
+  <div id="app">
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import NavigatorBar from "@/components/NavigatorBar.vue";
-import MainContent from "@/components/MainContent.vue";
-import {mapState} from "vuex";
-
 export default {
   name: 'App',
-  components: {
-    NavigatorBar,
-    MainContent
-  },
-  computed: {
-    ...mapState('globalInfo', ['navigatorFlag']),
-
-    appStyle() {
-      if (this.navigatorFlag)
-        return {
-          gridTemplateColumns: 'auto 1fr',
-        }
-      else
-        return {
-          gridTemplateColumns: '1fr',
-        }
-    }
-  },
 }
 </script>
 
 <style>
-html, body {
+html, body, #app {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   position: absolute;
 }
 
@@ -52,25 +29,6 @@ html, body {
 
 button {
   cursor: pointer; /* 鼠标悬停时显示手型光标 */
-}
-
-.navigator {
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* 填充整个屏幕高度 */
-  width: 280px;
-}
-
-.main-content {
-  height: 100%;
-}
-
-#app {
-  display: grid;
-  padding: 0;
-  margin: 0;
-  height: 100%;
-  width: 100%;
 }
 
 </style>

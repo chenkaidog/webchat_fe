@@ -1,5 +1,4 @@
 <script>
-import {getModelList} from "@/assets/js/content";
 import {mapMutations, mapState} from "vuex";
 
 export default {
@@ -10,7 +9,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('modelInfo', ['modelList','selectedName'])
+    ...mapState('modelInfo', ['modelList', 'selectedId', 'selectedName'])
   },
   methods: {
     ...mapMutations('modelInfo', ['selectModel']),

@@ -1,7 +1,7 @@
 <script>
-import ContentHeader from "./content/ContentHeader.vue";
-import ContentView from "./content/ContentView.vue";
-import ContentInput from "./content/ContentInput.vue";
+import ContentHeader from "@/pages/chat/content/ContentHeader.vue";
+import ContentView from "@/pages/chat/content/ContentView.vue";
+import ContentInput from "@/pages/chat/content/ContentInput.vue";
 
 export default {
   name: "MainContent",
@@ -25,6 +25,7 @@ export default {
   height: 100vh;
   width: 100%;
   position: relative;
+  overflow-y: auto;
 }
 
 .content-header {

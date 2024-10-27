@@ -1,6 +1,6 @@
 <script>
-import RecordItem from "./navigator/RecordItem.vue";
-import NavHeader from "./navigator/NavHeader.vue";
+import RecordItem from "@/pages/chat/navigator/RecordItem.vue";
+import NavHeader from "@/pages/chat/navigator/NavHeader.vue";
 import {mapState} from "vuex";
 
 export default {
@@ -16,13 +16,13 @@ export default {
   <div>
     <NavHeader/>
 
-    <ul class="nav-record-list">
+    <div class="nav-record-list">
       <RecordItem
           v-for="record in recordList"
           :key="record.id"
           :record="record"
       />
-    </ul>
+    </div>
   </div>
 </template>
 

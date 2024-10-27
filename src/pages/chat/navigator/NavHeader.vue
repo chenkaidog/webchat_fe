@@ -1,5 +1,6 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
   name: "NavHeader",
@@ -18,7 +19,12 @@ export default {
 
     createConversation() {
       if (this.isInputting) {
-        // todo: 创建新对话
+        this.$router.push({
+          name: 'chat',
+          params: {
+            chatId: uuidv4(),
+          }
+        });
       }
     },
   }

@@ -14,19 +14,25 @@ export default {
   },
 
   methods: {
-    ...mapMutations('accountInfo', ['login', 'logout']),
+    ...mapMutations('accountInfo', ['logout']),
 
-    accountLogin() {
-      this.login({
-        id: 'test_account_id',
-        name: 'test_account'
-      })
+    navigate2Login() {
+      // 获取当前页面的完整路径
+      const currentUrl = this.$route.fullPath;
+      // 编码当前 URL
+      const encodedUrl = encodeURIComponent(currentUrl);
+      // 跳转到登录页面，并带上编码后的当前 URL 作为参数
+      this.$router.push({
+        path: '/login',
+        query: { redirect: encodedUrl }
+      });
     },
     updatePassword() {
       console.log('updatePassword')
     },
     accountLogout() {
       this.logout()
+      this.$router.push('/')
     }
   }
 }
@@ -61,7 +67,7 @@ export default {
       <button
           class="account-option-button"
           v-show="!isLogin"
-          @click="accountLogin"
+          @click.prevent="navigate2Login"
       >
         登陆
       </button>

@@ -17,14 +17,14 @@ export function getModelList(accountId) {
     return null
 }
 
-export function storeChatRecord(chatId, recordList) {
-    localStorage.setItem(`chat_record_${chatId}`, JSON.stringify(recordList))
+export function storeChatRecord(accountId, chatId, recordList) {
+    localStorage.setItem(`chat_record_${accountId}_${chatId}`, JSON.stringify(recordList))
 }
 
-export function getChatRecord(chatId) {
-    return JSON.parse(localStorage.getItem(`chat_record_${chatId}`)) || []
+export function getChatRecord(accountId, chatId) {
+    return JSON.parse(localStorage.getItem(`chat_record_${accountId}_${chatId}`)) || []
 }
 
-export function deleteLocalChatRecord(chatId) {
-    localStorage.removeItem(`chat_record_${chatId}`)
+export function deleteLocalChatRecord(accountId,chatId) {
+    localStorage.removeItem(`chat_record_${accountId}_${chatId}`)
 }

@@ -21,6 +21,7 @@ new Vue({
     },
 
     mounted() {
+        // todo: 根据cookie判断用户是否登录，然后获取账户等信息
         if (this.isLogin) {
             return this.initUserInfoByAccount()
         }
