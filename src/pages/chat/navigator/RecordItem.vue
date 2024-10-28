@@ -54,10 +54,7 @@ export default {
 
     deleteRecord(id) {
       if (this.isInputting && confirm('删除后不可恢复！')) {
-        this.deleteChatRecord({
-          chatId: id,
-          accountId: this.accountId
-        })
+        this.deleteChatRecord(id)
 
         if (this.isSelected) {
           this.$router.push('/');

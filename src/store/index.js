@@ -4,6 +4,7 @@ import accountInfo from "@/store/account_info"
 import modelInfo from "@/store/model_info"
 import chatRecordDirectory from "@/store/chat_record"
 import globalInfo from "@/store/gloabl_info"
+import assistantResp from "@/store/assistant_resp"
 
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
         accountInfo,
         modelInfo,
         globalInfo,
-        chatRecordDirectory
+        chatRecordDirectory,
+        assistantResp
     }
 })

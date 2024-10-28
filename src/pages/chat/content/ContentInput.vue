@@ -1,7 +1,6 @@
 <script>
-import PubSub from "pubsub-js";
 import example from '@/assets/js/example'
-import {mapActions, mapGetters, mapState} from "vuex";
+import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 
 export default {
   name: "ContentInput",
@@ -12,24 +11,19 @@ export default {
   },
 
   computed: {
-    ...mapState('accountInfo', ['isLogin']),
     ...mapState('modelInfo', ['selectedId', 'selectedName']),
     ...mapGetters('globalInfo', ['isInputting', 'isPending', 'isResponding'])
   },
 
   methods: {
     ...mapActions('globalInfo', ['setStateInput', 'setStatePending', 'setStateResponding']),
+    ...mapMutations('assistantResp', ['appendUserRequest', 'setResponding', 'closeResponding']),
 
     uploadAttachment() {
       console.log("Upload Attachment");
     },
 
     sendMsg() {
-      if (!this.isLogin) {
-        alert('请先登陆')
-        return
-      }
-
       const userInput = this.userInput.trim().replaceAll('\n', '\n\n')
       if (userInput.length <= 0) {
         // 无效文本
@@ -39,14 +33,17 @@ export default {
 
       // 展示初始消息
       this.setStatePending();
+
       setTimeout(() => {
-        PubSub.publish('appendChatEvent', {
+        this.appendUserRequest({
           id: Date.now().toString(),
           model: this.selectedName,
           user: userInput,
           assistant: '...'
         })
+      }, 1000)
 
+      setTimeout(() => {
         this.setStateResponding()
         this.userInput = ''
 
@@ -56,17 +53,17 @@ export default {
           if (idx < example.length && !vm.isInputting) {
             setTimeout(() => {
               respBuffer += example[idx]
-              PubSub.publish('assistantRespEvent', respBuffer)
+              vm.setResponding(respBuffer)
               f(vm, idx + 1)
             }, 1)
           } else {
             vm.setStateInput()
-            PubSub.publish('assistantRespEvent', null) // 结束标记
+            vm.closeResponding()
           }
         }
 
         f(this, 0);
-      }, 2000)
+      }, 3000)
     },
 
     stopGenerating() {

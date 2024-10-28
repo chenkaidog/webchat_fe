@@ -40,6 +40,7 @@ new Vue({
     methods: {
         ...mapMutations('chatRecordDirectory', ['setChatRecord', 'cleanupChatRecord']),
         ...mapMutations('modelInfo', ['setModelList', 'cleanupModelList']),
+        ...mapMutations('assistantResp', ['cleanupChatList']),
 
         initUserInfoByAccount() {
             this.setChatRecord(this.accountId)
@@ -49,6 +50,7 @@ new Vue({
         cleanupUserInfo() {
             this.cleanupChatRecord();
             this.cleanupModelList();
+            this.cleanupChatList()
         }
     }
 }).$mount('#app')

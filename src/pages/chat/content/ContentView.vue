@@ -1,7 +1,5 @@
 <script>
-import MarkdownIt from '@/pages/chat/content/MarkdownIt.vue'
-import PubSub from "pubsub-js";
-import {storeChatRecord, getChatRecord} from '@/assets/js/content'
+import MarkdownIt from '@/pages/chat/content/MarkdownIt'
 import {mapMutations, mapState} from "vuex";
 import {v4 as uuidv4} from "uuid";
 
@@ -12,16 +10,13 @@ export default {
   },
   data() {
     return {
-      chatRecords: [],
       fixToBottom: true,
     }
   },
 
   computed: {
-    ...mapState('accountInfo', {
-      isLogin: state => state.isLogin,
-      accountId: state => state.id,
-    }),
+    ...mapState('accountInfo', {accountId: state => state.id}),
+    ...mapState('assistantResp', ['chatList', 'responding']),
 
     currentChatId() {
       let chatId = this.$route.params.chatId;
@@ -37,52 +32,52 @@ export default {
     currentChatId(newId) {
       this.selectRecord(newId)
     },
-    isLogin(login) {
-      if (!login) {
-        this.chatRecords = [];
+
+    responding(newResp, oldResp) {
+      if (oldResp !== '' && newResp === '') {
+        // 响应被关闭
+        const n = this.chatList.length
+        if (n > 0) {
+          this.appendChatRecord({
+            chatId: this.currentChatId,
+            msg: this.chatList[n - 1].assistant
+          })
+        }
+        return
       }
-    },
+
+      if (oldResp === '' && newResp === '...') {
+        // 收到用户请求
+        this.fixToBottom = true
+        this.scrollToBottom()
+        if (this.$route.params.chatId !== this.currentChatId) {
+          this.$router.replace({
+            name: 'chat',
+            params: {chatId: this.currentChatId}
+          })
+        }
+
+        return
+      }
+
+      // 持续接收响应
+      if (this.fixToBottom) {
+        this.scrollToBottom();
+      }
+    }
   },
 
   methods: {
     ...mapMutations('chatRecordDirectory', ['appendChatRecord']),
+    ...mapMutations('assistantResp', ['setChatList']),
 
     selectRecord(chatId) {
-      this.chatRecords = getChatRecord(this.accountId, chatId) || []
-      this.scrollToBottom()
-    },
-
-    handleAssistantRespEvent(_, respMsg) {
-      // 接收持续推送
-      const n = this.chatRecords.length
-      if (n > 0) {
-        if (respMsg === null) {
-          this.appendChatRecord({
-            chatId: this.currentChatId,
+      this.setChatList(
+          {
             accountId: this.accountId,
-            msg: this.chatRecords[n - 1].assistant
-          })
-
-          storeChatRecord(this.accountId, this.currentChatId, this.chatRecords)
-          return
-        }
-        this.chatRecords[n - 1].assistant = respMsg
-        if (this.fixToBottom) {
-          this.scrollToBottom()
-        }
-      }
-    },
-
-    handleAppendChatEvent(_, chatItem) {
-      if (this.$route.params.chatId !== this.currentChatId) {
-        this.$router.replace({
-          name: 'chat',
-          params: {chatId: this.currentChatId}
-        })
-      }
-      // 用户成功触发一次请求
-      this.chatRecords.push(chatItem)
-      this.fixToBottom = true
+            chatId: chatId
+          }
+      )
       this.scrollToBottom()
     },
 
@@ -93,14 +88,6 @@ export default {
     }
   },
 
-  created() {
-    this.appendChatEvent = PubSub.subscribe('appendChatEvent', this.handleAppendChatEvent)
-    this.assisantRespEvent = PubSub.subscribe('assistantRespEvent', this.handleAssistantRespEvent)
-  },
-  beforeDestroy() {
-    PubSub.unsubscribe(this.assisantRespEvent)
-    PubSub.unsubscribe(this.appendChatEvent)
-  },
   mounted() {
     this.selectRecord(this.currentChatId);
   },
@@ -116,7 +103,7 @@ export default {
     <ul class="chat-list">
       <li
           class="single-chat-li"
-          v-for="record in chatRecords"
+          v-for="record in chatList"
           :key="record.id"
       >
         <div class="content">

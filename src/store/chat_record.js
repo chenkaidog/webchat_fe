@@ -4,25 +4,24 @@ import {initRecordList, storeRecordList} from "@/assets/js/navigator";
 export default {
     namespaced: true,
     state: {
+        accountId: '',
         recordList: [], // 会话记录列表，左侧菜单栏
     },
     actions: {},
     mutations: {
-        deleteChatRecord(state, userIds) {
-            state.recordList = state.recordList.filter((item) => {
-                return item.id !== userIds.chatId
-            })
-
-            deleteLocalChatRecord(userIds.accountId, userIds.chatId);
-            storeRecordList(userIds.accountId, state.recordList);
-        },
-
         setChatRecord(state, accountId) {
+            state.accountId = accountId
             state.recordList = initRecordList(accountId) || []
             state.recordList.sort((a, b) => b.timestamp - a.timestamp)
-            state.recordList.forEach(item => {
-                item.isSelected = false
+        },
+
+        deleteChatRecord(state, chatId) {
+            state.recordList = state.recordList.filter((item) => {
+                return item.id !== chatId
             })
+
+            deleteLocalChatRecord( state.accountId, chatId);
+            storeRecordList( state.accountId, state.recordList);
         },
 
         appendChatRecord(state, chatItem) {
@@ -35,11 +34,8 @@ export default {
             state.recordList.forEach(item => {
                 if (item.id === chatItem.chatId) {
                     item.latestMsg = extraction
-                    item.isSelected = true
                     item.timestamp = Date.now()
                     exist = true
-                } else {
-                    item.isSelected = false
                 }
             })
 
@@ -48,17 +44,17 @@ export default {
                     id: chatItem.chatId,
                     timestamp: Date.now(),
                     latestMsg: extraction,
-                    isSelected: true,
                 })
             }
 
             state.recordList.sort((a, b) => b.timestamp - a.timestamp)
 
-            storeRecordList(chatItem.accountId, state.recordList)
+            storeRecordList( state.accountId, state.recordList)
         },
 
         cleanupChatRecord(state) {
             state.recordList = []
+            state.accountId = ''
         },
     },
     getters: {}
