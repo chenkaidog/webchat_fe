@@ -40,7 +40,6 @@ export default {
     ...mapMutations('accountInfo', ['login']),
 
     accountLogin() {
-      // todo: 请求参数校验
       if (this.username === 'test_account' && this.password === '123456') {
         this.login({
           id: 'test_account_id',
@@ -73,11 +72,9 @@ export default {
         <svg class="input-icon"
              xmlns="http://www.w3.org/2000/svg"
              viewBox="0 0 22 22">
-          <path d="M9 3H13V4H14V5H15V9H14V10H13V11H9V10H8V9H7V5H8V4H9V3M10
-        8V9H12V8H13V6H12V5H10V6H9V8H10M7
-        12H15V13H17V14H18V15H19V19H3V15H4V14H5V13H7V12M6
-        16H5V17H17V16H16V15H14V14H8V15H6V16Z"
-          />
+          <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,
+          8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,
+          18V20H4V18C4,15.79 7.58,14 12,14Z"/>
         </svg>
 
         <input
@@ -91,9 +88,9 @@ export default {
         <svg class="input-icon"
              xmlns="http://www.w3.org/2000/svg"
              viewBox="0 0 22 22">
-          <path d="M9 15H5V14H4V13H3V9H4V8H5V7H9V8H10V9H11V10H19V12H17V14H15V12H11V13H10V14H9M8
-        13V12H9V10H8V9H6V10H5V12H6V13Z"
-          />
+          <path d="M7 14C5.9 14 5 13.1 5 12S5.9 10 7 10 9 10.9 9 12 8.1 14 7
+          14M12.6 10C11.8 7.7 9.6 6 7 6C3.7 6 1 8.7 1 12S3.7
+          18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6Z"/>
         </svg>
 
         <input
@@ -189,6 +186,7 @@ export default {
   float: right;
   font-size: 12px;
   color: orangered;
+  font-weight: bold;
 }
 
 .login-row-button {
