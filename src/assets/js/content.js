@@ -1,5 +1,5 @@
-import { GetCsrfToken } from "./account_info"
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import {GetCsrfToken} from "./account_info"
+import {fetchEventSource} from '@microsoft/fetch-event-source';
 
 export async function ModelListFetch() {
     const response = await fetch('/api/v1/model/list', {
@@ -13,6 +13,9 @@ export async function ModelListFetch() {
     if (!response.ok) {
         if (response.status === 401) {
             return [];
+        }
+        if (response.status === 429) {
+            throw new Error('请求过于频繁，稍后再重试')
         }
 
         throw new Error('网络异常，请刷新模型列表');
@@ -37,7 +40,6 @@ export function StreamChatFetch(
     model, contents, latestMsg, stopSignal,
     onOpenHandler,
     onMessageHandler,
-    onCloseHandler,
     onErrorHandler,
 ) {
     let streamChatReq = parseStreamChatReq(model, contents, latestMsg)
@@ -55,13 +57,16 @@ export function StreamChatFetch(
             signal: stopSignal,
             onopen: onOpenHandler,
             onmessage: onMessageHandler,
-            onclose: onCloseHandler,
             onerror: onErrorHandler
         },
     )
 }
 
 function parseStreamChatReq(model, contents, latestMsg) {
+    if (latestMsg.length > 10000) {
+        throw new Error('文本长度不能大于10000字')
+    }
+
     let streamChatReq = {
         "model_id": model,
         "messages": [],
@@ -87,8 +92,8 @@ function parseStreamChatReq(model, contents, latestMsg) {
     }
 
     streamChatReq.messages.push({
+        "role": "user",
         "content": latestMsg,
-        "role": "user"
     })
 
     return streamChatReq

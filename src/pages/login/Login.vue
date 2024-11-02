@@ -42,7 +42,7 @@ export default {
     ...mapMutations('accountInfo', ['login']),
 
     async accountLogin() {
-      const regex = /^[^\s]{5,64}$/; // todo上线后改掉这里，长度最少应该为8
+      const regex = /^\S{5,64}$/; // todo上线后改掉这里，长度最少应该为8
       if (!regex.test(this.username) || !regex.test(this.password)) {
         this.tips = '账号或密码必须是8到64位且不包含空格';
         return
@@ -68,7 +68,7 @@ export default {
 
         this.navigate2Redirect();
       } catch (error) {
-        this.tips = '网络异常，请重试';
+        this.tips = error.message;
       } finally {
         this.waiting = false
       }

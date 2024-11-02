@@ -18,14 +18,20 @@ export async function LoginFetch(username, password) {
         })
     })
     if (!response.ok) {
-        throw new Error('Network response was not ok.');
+        if (response.status === 429) {
+            throw new Error('请求过于频繁，稍后再重试')
+        }
+        if (response.status === 403) {
+            throw new Error('请求异常，请一小时后重试')
+        }
+        throw new Error('网络异常，请重试');
     }
 
     const csrfToken = response.headers.get('X-Csrf-Token');
     if (csrfToken) {
         StoreCsrfToken(csrfToken)
     }
-    
+
     return await response.json()
 }
 
@@ -42,11 +48,15 @@ export async function LogoutFetch() {
             if (response.status === 401) {
                 return true
             }
-            throw new Error('Network response was not ok.');
+            if (response.status === 429) {
+                throw new Error('请求过于频繁，稍后再重试')
+            }
+            throw new Error('网络异常，请重试');
         }
         const body = await response.json();
         return body.success
     } catch (error) {
+        alert(error.message)
         return false
     }
 }

@@ -1,7 +1,7 @@
 <script>
-import { StreamChatFetch } from '@/assets/js/content';
+import {StreamChatFetch} from '@/assets/js/content';
 import example from '@/assets/js/example'
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
+import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 
 export default {
   name: "ContentInput",
@@ -26,7 +26,7 @@ export default {
       console.log("Upload Attachment");
     },
 
-    sendMsg() {
+    async sendMsg() {
       const userInput = this.userInput.trim().replaceAll('\n', '\n\n')
       if (userInput.length <= 0) {
         // 无效文本
@@ -55,6 +55,9 @@ export default {
         if (response.status === 401) {
           throw new Error('请先登录')
         }
+        if (response.status === 429) {
+          throw new Error('请求过于频繁，稍后再重试')
+        }
 
         throw new Error('网络异常，请重试')
       }
@@ -74,27 +77,28 @@ export default {
         }
 
         if (data.isEnd) {
-          signal.abort()
+          vueModel.signal.abort()
         }
       }
-      const onclose = () => {
-        vueModel.setStateInput()
-        vueModel.closeResponding()
-      }
       const onerror = err => {
-        alert(err)
+        throw new Error(err)
       }
-
-      StreamChatFetch(
-        this.selectedId,
-        this.chatList,
-        this.userInput,
-        this.signal.signal,
-        onopen,
-        onmessage,
-        onclose,
-        onerror
-      )
+      try {
+        await StreamChatFetch(
+            this.selectedId,
+            this.chatList,
+            this.userInput,
+            this.signal.signal,
+            onopen,
+            onmessage,
+            onerror
+        )
+      } catch (error) {
+        alert(error)
+      } finally {
+        this.setStateInput()
+        this.closeResponding()
+      }
     },
 
     stopGenerating() {
@@ -130,14 +134,14 @@ export default {
                 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614
                 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12
                 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569
-                13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" />
+                13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z"/>
           </svg>
         </button>
       </div>
 
       <div class="input-div">
         <textarea class="input-text" placeholder="给AI发送消息(ctrl+↵)" v-model="userInput" :disabled="isPending"
-          ref="userInputArea" @keydown.ctrl.enter="sendMsg" />
+                  ref="userInputArea" @keydown.ctrl.enter="sendMsg"/>
       </div>
 
       <div class="control-div">
@@ -145,14 +149,14 @@ export default {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <title>发送</title>
             <path
-              d="M12 2C17.5 2 22 6.5 22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2ZM16 17V15H8V17H16ZM16 10L12 6L8 10H10.5V14H13.5V10H16Z" />
+                d="M12 2C17.5 2 22 6.5 22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2ZM16 17V15H8V17H16ZM16 10L12 6L8 10H10.5V14H13.5V10H16Z"/>
           </svg>
         </button>
 
         <button class="control-btn" v-show="isResponding" @click="stopGenerating">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <title>停止生成</title>
-            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9" />
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9"/>
           </svg>
         </button>
       </div>
