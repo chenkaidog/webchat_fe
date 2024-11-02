@@ -1,5 +1,5 @@
 <script>
-import {RenderMarkdown} from '@/assets/js/render.js'
+import { RenderMarkdown } from '@/assets/js/render.js'
 import '@/assets/css/markdown-it-vue.css'
 
 export default {
@@ -17,11 +17,9 @@ export default {
 </script>
 
 <template>
-  <div >
-    <div class="markdown-body" v-html="renderMarkdown(content)"/>
+  <div>
+    <div class="markdown-body" v-html="renderMarkdown(content)" />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

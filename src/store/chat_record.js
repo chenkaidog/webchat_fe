@@ -1,5 +1,5 @@
-import {deleteLocalChatRecord} from "@/assets/js/content";
-import {initRecordList, storeRecordList} from "@/assets/js/navigator";
+import { deleteLocalChatRecord } from "@/assets/js/content";
+import { initRecordList, storeRecordList } from "@/assets/js/navigator";
 
 export default {
     namespaced: true,
@@ -20,8 +20,8 @@ export default {
                 return item.id !== chatId
             })
 
-            deleteLocalChatRecord( state.accountId, chatId);
-            storeRecordList( state.accountId, state.recordList);
+            deleteLocalChatRecord(state.accountId, chatId);
+            storeRecordList(state.accountId, state.recordList);
         },
 
         appendChatRecord(state, chatItem) {
@@ -49,7 +49,7 @@ export default {
 
             state.recordList.sort((a, b) => b.timestamp - a.timestamp)
 
-            storeRecordList( state.accountId, state.recordList)
+            storeRecordList(state.accountId, state.recordList)
         },
 
         cleanupChatRecord(state) {

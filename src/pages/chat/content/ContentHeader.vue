@@ -1,12 +1,12 @@
 <script>
 import HeaderAccount from "@/pages/chat/content/HeaderAccount.vue";
 import HeaderModel from "@/pages/chat/content/HeaderModel.vue";
-import {mapActions, mapGetters, mapState} from "vuex";
-import {v4 as uuidv4} from "uuid";
+import { mapActions, mapGetters, mapState } from "vuex";
+import { v4 as uuidv4 } from "uuid";
 
 export default {
   name: "ContentHeader",
-  components: {HeaderAccount, HeaderModel},
+  components: { HeaderAccount, HeaderModel },
   data() {
     return {
       showHideBarTips: false,
@@ -42,31 +42,22 @@ export default {
       <div class="bar-control-div" v-show="!navigatorFlag">
 
         <div class="hide-div">
-          <button
-              class="btn-hide-bar"
-              @mouseover="showHideBarTips=true"
-              @mouseout="showHideBarTips=false"
-              @click="openNavigator()"
-          >
+          <button class="btn-hide-bar" @mouseover="showHideBarTips = true" @mouseout="showHideBarTips = false"
+            @click="openNavigator()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
-                  d="M15 21H17V19H15M19 9H21V7H19M3 5V19C3 20.1 3.9 21 5 21H9V19H5V5H9V3H5C3.9 3 3 3.9 3 5M19
-                  3V5H21C21 3.9 20.1 3 19 3M11 23H13V1H11M19 17H21V15H19M15 5H17V3H15M19 13H21V11H19M19 21C20.1 21 21 20.1 21 19H19Z"/>
+                d="M15 21H17V19H15M19 9H21V7H19M3 5V19C3 20.1 3.9 21 5 21H9V19H5V5H9V3H5C3.9 3 3 3.9 3 5M19
+                  3V5H21C21 3.9 20.1 3 19 3M11 23H13V1H11M19 17H21V15H19M15 5H17V3H15M19 13H21V11H19M19 21C20.1 21 21 20.1 21 19H19Z" />
             </svg>
           </button>
           <div class="tips" v-show="showHideBarTips">打开边栏</div>
         </div>
 
         <div class="new-conv-div">
-          <button
-              class="btn-new-conversation"
-              @mouseover="showNewConversationTips=true"
-              @mouseout="showNewConversationTips=false"
-              @click="createNewConversation()"
-          >
+          <button class="btn-new-conversation" @mouseover="showNewConversationTips = true"
+            @mouseout="showNewConversationTips = false" @click="createNewConversation()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path
-                  d="M15.6729 3.91287C16.8918 2.69392 18.8682 2.69392 20.0871 3.91287C21.3061 5.13182 21.3061
+              <path d="M15.6729 3.91287C16.8918 2.69392 18.8682 2.69392 20.0871 3.91287C21.3061 5.13182 21.3061
                   7.10813 20.0871 8.32708L14.1499 14.2643C13.3849 15.0293 12.3925 15.5255 11.3215 15.6785L9.14142
                   15.9899C8.82983 16.0344 8.51546 15.9297 8.29289 15.7071C8.07033 15.4845 7.96554 15.1701 8.01005
                   14.8586L8.32149 12.6785C8.47449 11.6075 8.97072 10.615 9.7357 9.85006L15.6729 3.91287ZM18.6729
@@ -87,17 +78,17 @@ export default {
                    17.0374 3.05782 16.3086C2.99998 15.6007 2.99999 14.7266 3 13.6428V10.3572C2.99999 9.27337 2.99998 8.39922
                    3.05782 7.69134C3.11737 6.96249 3.24318 6.3223 3.54497 5.73001C4.02433 4.7892 4.78924 4.0243 5.73005
                    3.54493C6.28633 3.26149 6.88399 3.13358 7.55735 3.06961C8.21919 3.00673 9.02103 3.00083 9.99922
-                   3.00007C10.5515 2.99964 10.9996 3.447 11 3.99929Z"/>
+                   3.00007C10.5515 2.99964 10.9996 3.447 11 3.99929Z" />
             </svg>
           </button>
           <div class="tips" v-show="showNewConversationTips">新聊天</div>
         </div>
       </div>
 
-      <HeaderModel class="select-div"/>
+      <HeaderModel class="select-div" />
     </div>
 
-    <HeaderAccount class="account-div"/>
+    <HeaderAccount class="account-div" />
   </div>
 </template>
 
@@ -173,5 +164,4 @@ export default {
 .account-div {
   position: relative;
 }
-
 </style>

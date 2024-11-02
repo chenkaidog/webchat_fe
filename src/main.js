@@ -3,7 +3,8 @@ import App from './App.vue'
 import VueRouter from 'vue-router'
 import router from './router'
 import store from './store'
-import {mapMutations, mapState} from "vuex";
+import { mapMutations, mapState } from "vuex";
+import { GetAccountInfoFetch } from './assets/js/account_info'
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
@@ -20,8 +21,23 @@ new Vue({
         })
     },
 
-    mounted() {
-        // todo: 根据cookie判断用户是否登录，然后获取账户等信息
+    async mounted() {
+        try {
+            const body = await GetAccountInfoFetch()
+            if (body) {
+                if (body.success) {
+                    return this.login({
+                        id: body.data.account_id,
+                        name: body.data.username,
+                    })
+                }
+
+                throw new Error(body.message)
+            }
+        } catch (error) {
+            alert(error);
+        }
+
         if (this.isLogin) {
             return this.initUserInfoByAccount()
         }
@@ -41,16 +57,18 @@ new Vue({
         ...mapMutations('chatRecordDirectory', ['setChatRecord', 'cleanupChatRecord']),
         ...mapMutations('modelInfo', ['setModelList', 'cleanupModelList']),
         ...mapMutations('assistantResp', ['cleanupChatList']),
+        ...mapMutations('accountInfo', ['login']),
 
         initUserInfoByAccount() {
             this.setChatRecord(this.accountId)
-            this.setModelList(this.accountId)
+            this.setModelList()
         },
 
         cleanupUserInfo() {
             this.cleanupChatRecord();
             this.cleanupModelList();
-            this.cleanupChatList()
+            this.cleanupChatList();
+            localStorage.clear();
         }
     }
 }).$mount('#app')

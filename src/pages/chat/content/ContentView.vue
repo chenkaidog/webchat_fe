@@ -1,7 +1,7 @@
 <script>
 import MarkdownIt from '@/pages/chat/content/MarkdownIt'
-import {mapMutations, mapState} from "vuex";
-import {v4 as uuidv4} from "uuid";
+import { mapMutations, mapState } from "vuex";
+import { v4 as uuidv4 } from "uuid";
 
 export default {
   name: "ContentView",
@@ -15,7 +15,7 @@ export default {
   },
 
   computed: {
-    ...mapState('accountInfo', {accountId: state => state.id}),
+    ...mapState('accountInfo', { accountId: state => state.id }),
     ...mapState('assistantResp', ['chatList', 'responding']),
 
     currentChatId() {
@@ -53,7 +53,7 @@ export default {
         if (this.$route.params.chatId !== this.currentChatId) {
           this.$router.replace({
             name: 'chat',
-            params: {chatId: this.currentChatId}
+            params: { chatId: this.currentChatId }
           })
         }
 
@@ -73,10 +73,10 @@ export default {
 
     selectRecord(chatId) {
       this.setChatList(
-          {
-            accountId: this.accountId,
-            chatId: chatId
-          }
+        {
+          accountId: this.accountId,
+          chatId: chatId
+        }
       )
       this.scrollToBottom()
     },
@@ -95,24 +95,16 @@ export default {
 </script>
 
 <template>
-  <div
-      class="content-view"
-      ref="contentView"
-      @wheel="fixToBottom=false"
-  >
+  <div class="content-view" ref="contentView" @wheel="fixToBottom = false">
     <ul class="chat-list">
-      <li
-          class="single-chat-li"
-          v-for="record in chatList"
-          :key="record.id"
-      >
+      <li class="single-chat-li" v-for="record in chatList" :key="record.id">
         <div class="content">
-          <MarkdownIt class="user-content" :content="record.user"/>
+          <MarkdownIt class="user-content" :content="record.user" />
         </div>
 
         <div class="content">
-          <p class="assistant-model" v-text="record.model"/>
-          <MarkdownIt class="assistant-content" :content="record.assistant"/>
+          <p class="assistant-model" v-text="record.model" />
+          <MarkdownIt class="assistant-content" :content="record.assistant" />
         </div>
       </li>
     </ul>
@@ -158,7 +150,8 @@ export default {
   background-color: #f0f0f0;
   text-size-adjust: 100%;
   display: flex;
-  align-items: center; /* 实现文本的垂直居中 */
+  align-items: center;
+  /* 实现文本的垂直居中 */
   padding: 10px 15px;
 }
 
@@ -168,5 +161,4 @@ export default {
   border-radius: 10px;
   border: 1px solid #e0e0e0;
 }
-
 </style>

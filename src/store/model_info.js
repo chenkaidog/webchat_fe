@@ -1,4 +1,4 @@
-import {getModelList} from "@/assets/js/content";
+import { ModelListFetch } from "@/assets/js/content";
 
 export default {
     namespaced: true,
@@ -20,13 +20,25 @@ export default {
             state.selectedId = model.id
             state.selectedName = model.name
         },
-        setModelList(state, accountId) {
-            state.modelList = getModelList(accountId) || []
-            if (state.modelList.length > 0) {
-                state.selectedId = state.modelList[0].id
-                state.selectedName = state.modelList[0].name
+        async setModelList(state) {
+            try {
+                const body = await ModelListFetch()
+                if (!body.success) {
+                    state.modelList = []
+                    return alert(body.message)
+                }
+
+                state.modelList = body.data.models || []
+                if (state.modelList.length > 0) {
+                    state.selectedId = state.modelList[0].id
+                    state.selectedName = state.modelList[0].name
+                }
+            } catch (error) {
+                state.modelList = []
+                alert(error)
             }
         },
+
         cleanupModelList(state) {
             state.selectedId = ''
             state.selectedName = '沒有可选模型'

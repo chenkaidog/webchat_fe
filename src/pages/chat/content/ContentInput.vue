@@ -1,18 +1,21 @@
 <script>
+import { StreamChatFetch } from '@/assets/js/content';
 import example from '@/assets/js/example'
-import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 
 export default {
   name: "ContentInput",
   data() {
     return {
       userInput: '',
+      signal: new AbortController(),
     }
   },
 
   computed: {
     ...mapState('modelInfo', ['selectedId', 'selectedName']),
-    ...mapGetters('globalInfo', ['isInputting', 'isPending', 'isResponding'])
+    ...mapGetters('globalInfo', ['isInputting', 'isPending', 'isResponding']),
+    ...mapState('assistantResp', ['chatList']),
   },
 
   methods: {
@@ -30,44 +33,73 @@ export default {
         alert('输入内容无效')
         return
       }
-
-      // 展示初始消息
       this.setStatePending();
 
-      setTimeout(() => {
-        this.appendUserRequest({
-          id: Date.now().toString(),
-          model: this.selectedName,
-          user: userInput,
-          assistant: '...'
-        })
-      }, 1000)
+      let respBuffer = ''
+      const vueModel = this
+      this.signal = new AbortController()
 
-      setTimeout(() => {
-        this.setStateResponding()
-        this.userInput = ''
-
-        let respBuffer = ''
-
-        function f(vm, idx) {
-          if (idx < example.length && !vm.isInputting) {
-            setTimeout(() => {
-              respBuffer += example[idx]
-              vm.setResponding(respBuffer)
-              f(vm, idx + 1)
-            }, 1)
-          } else {
-            vm.setStateInput()
-            vm.closeResponding()
-          }
+      const onopen = response => {
+        if (response.ok) {
+          vueModel.appendUserRequest({
+            id: Date.now().toString(),
+            model: this.selectedName,
+            user: userInput,
+            assistant: '...'
+          })
+          vueModel.setStateResponding()
+          vueModel.userInput = ''
+          return
         }
 
-        f(this, 0);
-      }, 3000)
+        if (response.status === 401) {
+          throw new Error('请先登录')
+        }
+
+        throw new Error('网络异常，请重试')
+      }
+      const onmessage = msg => {
+        if (!msg || !msg.data) {
+          return
+        }
+        const data = JSON.parse(msg.data)
+
+        if (msg.event === 'data') {
+          if (data.content && data.content.length > 0) {
+            respBuffer += data.content
+            vueModel.setResponding(respBuffer)
+          }
+        } else if (msg.event === 'error') {
+          throw new Error(data.content)
+        }
+
+        if (data.isEnd) {
+          signal.abort()
+        }
+      }
+      const onclose = () => {
+        vueModel.setStateInput()
+        vueModel.closeResponding()
+      }
+      const onerror = err => {
+        alert(err)
+      }
+
+      StreamChatFetch(
+        this.selectedId,
+        this.chatList,
+        this.userInput,
+        this.signal.signal,
+        onopen,
+        onmessage,
+        onclose,
+        onerror
+      )
     },
 
     stopGenerating() {
-      this.setStateInput()
+      this.signal.abort();
+      this.setStateInput();
     },
   },
 
@@ -94,48 +126,33 @@ export default {
         <button class="control-btn" @click="uploadAttachment">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <title>上传附件</title>
-            <path
-                d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401
+            <path d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401
                 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614
                 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12
                 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569
-                13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z"/>
+                13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" />
           </svg>
         </button>
       </div>
 
       <div class="input-div">
-        <textarea
-            class="input-text"
-            placeholder="给AI发送消息(ctrl+↵)"
-            v-model="userInput"
-            :disabled="isPending"
-            ref="userInputArea"
-            @keydown.ctrl.enter="sendMsg"
-        />
+        <textarea class="input-text" placeholder="给AI发送消息(ctrl+↵)" v-model="userInput" :disabled="isPending"
+          ref="userInputArea" @keydown.ctrl.enter="sendMsg" />
       </div>
 
       <div class="control-div">
-        <button
-            class="control-btn"
-            v-show="isInputting||isPending"
-            @click="sendMsg"
-            :disabled="isPending"
-        >
+        <button class="control-btn" v-show="isInputting || isPending" @click="sendMsg" :disabled="isPending">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <title>发送</title>
             <path
-                d="M12 2C17.5 2 22 6.5 22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2ZM16 17V15H8V17H16ZM16 10L12 6L8 10H10.5V14H13.5V10H16Z"/>
+              d="M12 2C17.5 2 22 6.5 22 12C22 17.5 17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2ZM16 17V15H8V17H16ZM16 10L12 6L8 10H10.5V14H13.5V10H16Z" />
           </svg>
         </button>
 
-        <button
-            class="control-btn"
-            v-show="isResponding"
-            @click="stopGenerating"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>停止生成</title>
-            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9"/>
+        <button class="control-btn" v-show="isResponding" @click="stopGenerating">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <title>停止生成</title>
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9" />
           </svg>
         </button>
       </div>
@@ -215,5 +232,4 @@ export default {
   right: 5px;
   bottom: 0;
 }
-
 </style>

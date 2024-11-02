@@ -10,6 +10,7 @@
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
     "@mdi/js": "^7.4.47",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "core-js": "^3.8.3",
     "markdown-it": "^14.1.0",
     "markdown-it-code-copy": "^0.2.1",

@@ -1,5 +1,6 @@
 <script>
-import {mapMutations, mapState} from "vuex";
+import { LoginFetch } from "@/assets/js/account_info";
+import { mapMutations, mapState } from "vuex";
 
 export default {
   name: "Login",
@@ -8,7 +9,8 @@ export default {
     return {
       username: '',
       password: '',
-      tips: ''
+      tips: '',
+      waiting: false,
     }
   },
 
@@ -39,23 +41,45 @@ export default {
   methods: {
     ...mapMutations('accountInfo', ['login']),
 
-    accountLogin() {
-      if (this.username === 'test_account' && this.password === '123456') {
-        this.login({
-          id: 'test_account_id',
-          name: 'test_account'
-        })
-
-        if (this.redirect) {
-          this.$router.push(decodeURIComponent(this.redirect))
-        } else {
-          this.$router.push('/')
-        }
-
+    async accountLogin() {
+      const regex = /^[^\s]{5,64}$/; // todo上线后改掉这里，长度最少应该为8
+      if (!regex.test(this.username) || !regex.test(this.password)) {
+        this.tips = '账号或密码必须是8到64位且不包含空格';
         return
       }
 
-      this.tips = '账号或密码错误，请重新检查'
+      this.waiting = true
+
+      try {
+        const body = await LoginFetch(this.username, this.password)
+        if (!body.success) {
+          if (body.code === 20001) {
+            this.tips = '账户或密码错误'
+          } else {
+            this.tips = body.message;
+          }
+          return
+        }
+
+        this.login({
+          id: body.data.account_id,
+          name: body.data.username,
+        })
+
+        this.navigate2Redirect();
+      } catch (error) {
+        this.tips = '网络异常，请重试';
+      } finally {
+        this.waiting = false
+      }
+    },
+
+    navigate2Redirect() {
+      if (this.redirect) {
+        this.$router.push(decodeURIComponent(this.redirect))
+      } else {
+        this.$router.push('/')
+      }
     },
 
     register() {
@@ -69,35 +93,23 @@ export default {
   <div id="login">
     <div class="login-form">
       <div class="login-row-input">
-        <svg class="input-icon"
-             xmlns="http://www.w3.org/2000/svg"
-             viewBox="0 0 22 22">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
           <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,
           8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,
-          18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+          18V20H4V18C4,15.79 7.58,14 12,14Z" />
         </svg>
 
-        <input
-            class="user-input"
-            type="text"
-            v-model="username"
-            placeholder="输入账号...">
+        <input class="user-input" type="text" v-model="username" placeholder="输入账号..." :disabled="waiting">
       </div>
 
       <div class="login-row-input">
-        <svg class="input-icon"
-             xmlns="http://www.w3.org/2000/svg"
-             viewBox="0 0 22 22">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
           <path d="M7 14C5.9 14 5 13.1 5 12S5.9 10 7 10 9 10.9 9 12 8.1 14 7
           14M12.6 10C11.8 7.7 9.6 6 7 6C3.7 6 1 8.7 1 12S3.7
-          18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6Z"/>
+          18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6Z" />
         </svg>
 
-        <input
-            class="user-input"
-            type="password"
-            v-model="password"
-            placeholder="输入密码...">
+        <input class="user-input" type="password" v-model="password" placeholder="输入密码..." :disabled="waiting">
       </div>
 
       <div class="tips">
@@ -106,13 +118,14 @@ export default {
 
       <div class="login-row-button">
         <span>
-          <button @click="accountLogin()">
-            登录
+          <button @click="accountLogin" :disabled="waiting">
+            <span v-if="!waiting">登录</span>
+            <span v-if="waiting">登录中...</span>
           </button>
         </span>
 
         <span>
-          <button @click="register()">
+          <button @click="register" :disabled="waiting">
             注册
           </button>
         </span>
@@ -220,5 +233,4 @@ export default {
   font-size: 12px;
   float: right;
 }
-
 </style>
