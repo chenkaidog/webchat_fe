@@ -52,11 +52,23 @@ export default {
           return
         }
 
-        if (response.status === 401) {
-          throw new Error('请先登录')
-        }
-        if (response.status === 429) {
-          throw new Error('请求过于频繁，稍后再重试')
+        if (400 <= response.status && response.status <= 500) {
+          if (response.status === 400 || response.status === 404) {
+            throw new Error('请求异常，请联系管理员')
+          }
+          if (response.status === 401) {
+            throw new Error('请先登录')
+          }
+          if (response.status === 429) {
+            const body = response.json()
+            switch (body.code) {
+              case 10005:
+              case 30002:
+                throw new Error('请求过于频繁，稍后再重试')
+              case 30003:
+                throw new Error('平台余额不足，请联系管理员')
+            }
+          }
         }
 
         throw new Error('网络异常，请重试')
