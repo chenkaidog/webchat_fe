@@ -4,7 +4,7 @@ import VueRouter from 'vue-router'
 import router from './router'
 import store from './store'
 import { mapMutations, mapState } from "vuex";
-import { GetAccountInfoFetch } from './assets/js/account_info'
+import {ClearCsrfToken, GetAccountInfoFetch} from './assets/js/account_info'
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
@@ -35,7 +35,7 @@ new Vue({
                 throw new Error(body.message)
             }
         } catch (error) {
-            alert(error);
+            alert(error.message);
         }
 
         if (this.isLogin) {
@@ -56,19 +56,25 @@ new Vue({
     methods: {
         ...mapMutations('chatRecordDirectory', ['setChatRecord', 'cleanupChatRecord']),
         ...mapMutations('modelInfo', ['setModelList', 'cleanupModelList']),
-        ...mapMutations('assistantResp', ['cleanupChatList']),
+        ...mapMutations('assistantResp', ['cleanupChatList', 'setChatList']),
         ...mapMutations('accountInfo', ['login']),
 
         initUserInfoByAccount() {
             this.setChatRecord(this.accountId)
-            this.setModelList()
+            this.setModelList();
+            this.setChatList(
+                {
+                    accountId: this.accountId,
+                    chatId: this.$route.params.chatId,
+                }
+            )
         },
 
         cleanupUserInfo() {
             this.cleanupChatRecord();
             this.cleanupModelList();
             this.cleanupChatList();
-            localStorage.clear();
+            ClearCsrfToken();
         }
     }
 }).$mount('#app')

@@ -2,6 +2,11 @@ export function StoreCsrfToken(token) {
     localStorage.setItem('web_chat_csrf_token', token);
 }
 
+export function ClearCsrfToken(token) {
+    localStorage.setItem('web_chat_csrf_token', null);
+}
+
+
 export function GetCsrfToken() {
     return localStorage.getItem('web_chat_csrf_token') || '';
 }

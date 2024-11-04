@@ -1,6 +1,5 @@
 <script>
 import {StreamChatFetch} from '@/assets/js/content';
-import example from '@/assets/js/example'
 import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 
 export default {

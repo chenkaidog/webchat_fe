@@ -5,7 +5,13 @@ export default {
     state: {
         accountId: '',
         chatId: '',
-        chatList: [],
+        chatList: [{
+            id: "123",
+            model: "文心4",
+            user: "嗨",
+            assistant: '嗨！你好呀，有什么我可以帮助你的吗？或者我们可以聊聊你感兴趣的话题。\n\n**但是你要先登录账号哦**',
+
+        }],
         responding: ''
     },
     actions: {},

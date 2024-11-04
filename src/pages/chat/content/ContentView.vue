@@ -87,10 +87,6 @@ export default {
       })
     }
   },
-
-  mounted() {
-    this.selectRecord(this.currentChatId);
-  },
 }
 </script>
 

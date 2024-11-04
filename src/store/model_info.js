@@ -20,9 +20,9 @@ export default {
             state.selectedId = model.id
             state.selectedName = model.name
         },
-        async setModelList(state) {
+        setModelList(state) {
             try {
-                const body = await ModelListFetch()
+                const body = ModelListFetch()
                 if (!body.success) {
                     state.modelList = []
                     return alert(body.message)
