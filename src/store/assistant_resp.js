@@ -24,6 +24,7 @@ export default {
             state.chatList = chatList.filter((item) => {
                 return item.assistant && item.assistant !== '...'
             })
+            state.responding = ''
         },
 
         // 用户成功发起请求后，先记录用户的请求内容
