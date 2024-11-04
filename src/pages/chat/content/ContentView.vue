@@ -72,6 +72,7 @@ export default {
     ...mapMutations('assistantResp', ['setChatList']),
 
     selectRecord(chatId) {
+      console.log(this.accountId, chatId)
       this.setChatList(
         {
           accountId: this.accountId,
