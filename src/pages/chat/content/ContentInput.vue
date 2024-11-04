@@ -89,7 +89,7 @@ export default {
         }
       }
       const onerror = err => {
-        throw new Error(err)
+        throw err
       }
       try {
         await StreamChatFetch(
@@ -102,7 +102,7 @@ export default {
             onerror
         )
       } catch (error) {
-        alert(error)
+        alert(error.message)
       } finally {
         this.setStateInput()
         PubSub.publish('assistant_responding', {
