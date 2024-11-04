@@ -57,17 +57,15 @@ new Vue({
         ...mapMutations('accountInfo', ['login']),
 
         initUserInfoByAccount() {
-            if (this.isLogin) {
-                this.setChatRecord(this.accountId)
-                this.setModelList();
+            this.setChatRecord(this.accountId)
+            this.setModelList();
 
-                this.setChatList(
-                    {
-                        accountId: this.accountId,
-                        chatId: this.$route.params.chatId,
-                    }
-                );
-            }
+            this.setChatList(
+                {
+                    accountId: this.accountId,
+                    chatId: this.$route.params.chatId,
+                }
+            );
         },
 
         cleanupUserInfo() {
