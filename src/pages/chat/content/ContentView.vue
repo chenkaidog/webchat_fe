@@ -18,6 +18,7 @@ export default {
   computed: {
     ...mapState('accountInfo', {accountId: state => state.id}),
     ...mapState('assistantResp', ['chatList']),
+    ...mapState('modelInfo', ['selectedName']),
 
     currentChatId() {
       let chatId = this.$route.params.chatId;
@@ -48,7 +49,6 @@ export default {
   },
 
   methods: {
-    ...mapState('modelInfo', ['selectedName']),
     ...mapMutations('chatRecordDirectory', ['appendChatRecord']),
     ...mapMutations('assistantResp', ['appendUserRequest', 'setChatList', 'setResponding', 'storeResponding']),
 
