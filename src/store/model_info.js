@@ -21,8 +21,7 @@ export default {
             state.selectedName = model.name
         },
         setModelList(state) {
-            try {
-                const body = ModelListFetch()
+            ModelListFetch().then(body => {
                 if (!body.success) {
                     state.modelList = []
                     return alert(body.message)
@@ -33,10 +32,10 @@ export default {
                     state.selectedId = state.modelList[0].id
                     state.selectedName = state.modelList[0].name
                 }
-            } catch (error) {
+            }).catch(error => {
                 state.modelList = []
                 alert(error)
-            }
+            })
         },
 
         cleanupModelList(state) {
