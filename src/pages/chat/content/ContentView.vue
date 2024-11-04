@@ -30,7 +30,6 @@ export default {
 
   watch: {
     currentChatId(newId) {
-      console.log(newId)
       this.selectRecord(newId)
     },
 

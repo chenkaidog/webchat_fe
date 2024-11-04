@@ -26,6 +26,7 @@ new Vue({
             .then(body => {
                 if (body) {
                     if (body.success) {
+                        console.log(body.data)
                         return this.login({
                             id: body.data.account_id,
                             name: body.data.username,
