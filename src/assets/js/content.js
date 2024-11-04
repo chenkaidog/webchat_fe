@@ -76,12 +76,12 @@ function parseStreamChatReq(model, contents, latestMsg) {
         if (assistantResp.length > 10) {
             streamChatReq.messages.push(
                 {
-                    "role": "user",
-                    "content": contents[index].user,
+                    role: "user",
+                    content: contents[index].user,
                 },
                 {
-                    "role": "assistant",
-                    "content": contents[index].assistant,
+                    role: "assistant",
+                    content: contents[index].assistant,
                 }
             )
         }
@@ -92,8 +92,8 @@ function parseStreamChatReq(model, contents, latestMsg) {
     }
 
     streamChatReq.messages.push({
-        "role": "user",
-        "content": latestMsg,
+        role: "user",
+        content: latestMsg,
     })
 
     return streamChatReq

@@ -62,12 +62,14 @@ new Vue({
         initUserInfoByAccount() {
             this.setChatRecord(this.accountId)
             this.setModelList();
+
+            console.log(this.accountId, this.$route.params.chatId)
             this.setChatList(
                 {
                     accountId: this.accountId,
                     chatId: this.$route.params.chatId,
                 }
-            )
+            );
         },
 
         cleanupUserInfo() {
