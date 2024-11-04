@@ -45,13 +45,12 @@ export default {
         })
       }
     },
-
-
   },
 
   methods: {
+    ...mapState('modelInfo', ['selectedName']),
     ...mapMutations('chatRecordDirectory', ['appendChatRecord']),
-    ...mapMutations('assistantResp', ['setChatList', 'setResponding']),
+    ...mapMutations('assistantResp', ['appendUserRequest', 'setChatList', 'setResponding', 'storeResponding']),
 
     selectRecord(chatId) {
       this.setChatList(
@@ -72,15 +71,26 @@ export default {
 
   created() {
     this.pubId = PubSub.subscribe('assistant_responding', (_, responding) => {
+      if (responding.isUserRequest) {
+        return this.appendUserRequest({
+              selectedName: this.selectedName,
+              userInput: responding.userInput,
+            }
+        )
+      }
+
       if (responding.isEnd) {
         // 响应被关闭
         const n = this.chatList.length
-        if (n > 0) {
+        if (n > 0 && this.chatList[n - 1].assistant !== '...') {
           this.appendChatRecord({
             chatId: this.currentChatId,
             msg: this.chatList[n - 1].assistant
           })
+
+          this.storeResponding()
         }
+
         return
       }
 

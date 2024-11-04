@@ -20,7 +20,7 @@ export default {
 
   methods: {
     ...mapActions('globalInfo', ['setStateInput', 'setStatePending', 'setStateResponding']),
-    ...mapMutations('assistantResp', ['appendUserRequest', 'closeResponding']),
+    ...mapMutations('assistantResp', ['appendUserRequest']),
 
     uploadAttachment() {
       console.log("Upload Attachment");
@@ -36,19 +36,17 @@ export default {
       this.setStatePending();
 
       let respBuffer = ''
-      const vueModel = this
       this.signal = new AbortController()
 
       const onopen = response => {
         if (response.ok) {
-          vueModel.appendUserRequest({
-            id: Date.now().toString(),
-            model: this.selectedName,
-            user: userInput,
-            assistant: '...'
+          PubSub.publish('assistant_responding', {
+            isUserRequest: true,
+            userInput: userInput,
           })
-          vueModel.setStateResponding()
-          vueModel.userInput = ''
+
+          this.setStateResponding()
+          this.userInput = ''
           return
         }
 
@@ -84,19 +82,10 @@ export default {
             respBuffer += data.content
             PubSub.publish('assistant_responding', {
               content: respBuffer,
-              isEnd: false,
             })
           }
         } else if (msg.event === 'error') {
           throw new Error(data.content)
-        }
-
-        if (data.isEnd) {
-          vueModel.signal.abort()
-          PubSub.publish('assistant_responding', {
-            content: respBuffer,
-            isEnd: true,
-          })
         }
       }
       const onerror = err => {
@@ -116,7 +105,9 @@ export default {
         alert(error)
       } finally {
         this.setStateInput()
-        this.closeResponding()
+        PubSub.publish('assistant_responding', {
+          isEnd: true,
+        })
       }
     },
 

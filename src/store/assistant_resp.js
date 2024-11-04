@@ -26,7 +26,12 @@ export default {
 
         // 用户成功发起请求后，先记录用户的请求内容
         appendUserRequest: (state, chatItem) => {
-            state.chatList.push(chatItem)
+            state.chatList.push({
+                id: Date.now().toString(),
+                model: chatItem.selectedName,
+                user: chatItem.userInput,
+                assistant: '...'
+            })
         },
 
         // 持续记录AI助手的响应
@@ -37,8 +42,10 @@ export default {
             }
         },
 
-        // 结束响应
-        closeResponding(state) {
+        storeResponding(state) {
+            state.chatList = state.chatList.filter((item) => {
+                return item.assistant && item.assistant !== '...'
+            })
             storeChatRecord(state.accountId, state.chatId, state.chatList)
         },
 
