@@ -1,7 +1,8 @@
 <script>
 import MarkdownIt from '@/pages/chat/content/MarkdownIt'
-import { mapMutations, mapState } from "vuex";
-import { v4 as uuidv4 } from "uuid";
+import {mapMutations, mapState} from "vuex";
+import {v4 as uuidv4} from "uuid";
+import PubSub from "pubsub-js";
 
 export default {
   name: "ContentView",
@@ -15,8 +16,8 @@ export default {
   },
 
   computed: {
-    ...mapState('accountInfo', { accountId: state => state.id }),
-    ...mapState('assistantResp', ['chatList', 'responding']),
+    ...mapState('accountInfo', {accountId: state => state.id}),
+    ...mapState('assistantResp', ['chatList']),
 
     currentChatId() {
       let chatId = this.$route.params.chatId;
@@ -33,8 +34,45 @@ export default {
       this.selectRecord(newId)
     },
 
-    responding(newResp, oldResp) {
-      if (oldResp !== '' && newResp === '') {
+    chatList() {
+      // 收到用户请求
+      this.fixToBottom = true
+      this.scrollToBottom()
+      if (this.$route.params.chatId !== this.currentChatId) {
+        this.$router.replace({
+          name: 'chat',
+          params: {chatId: this.currentChatId}
+        })
+      }
+    },
+
+
+  },
+
+  methods: {
+    ...mapMutations('chatRecordDirectory', ['appendChatRecord']),
+    ...mapMutations('assistantResp', ['setChatList', 'setResponding']),
+
+    selectRecord(chatId) {
+      this.setChatList(
+          {
+            accountId: this.accountId,
+            chatId: chatId
+          }
+      )
+      this.scrollToBottom()
+    },
+
+    scrollToBottom() {
+      this.$nextTick(() => {
+        this.$refs.contentView.scrollTop = this.$refs.contentView.scrollHeight;
+      })
+    }
+  },
+
+  created() {
+    this.pubId = PubSub.subscribe('assistant_responding', (_, responding) => {
+      if (responding.isEnd) {
         // 响应被关闭
         const n = this.chatList.length
         if (n > 0) {
@@ -46,47 +84,18 @@ export default {
         return
       }
 
-      if (oldResp === '' && newResp === '...') {
-        // 收到用户请求
-        this.fixToBottom = true
-        this.scrollToBottom()
-        if (this.$route.params.chatId !== this.currentChatId) {
-          this.$router.replace({
-            name: 'chat',
-            params: { chatId: this.currentChatId }
-          })
-        }
-
-        return
-      }
+      this.setResponding(responding.content)
 
       // 持续接收响应
       if (this.fixToBottom) {
         this.scrollToBottom();
       }
-    }
+    })
   },
 
-  methods: {
-    ...mapMutations('chatRecordDirectory', ['appendChatRecord']),
-    ...mapMutations('assistantResp', ['setChatList']),
-
-    selectRecord(chatId) {
-      this.setChatList(
-        {
-          accountId: this.accountId,
-          chatId: chatId
-        }
-      )
-      this.scrollToBottom()
-    },
-
-    scrollToBottom() {
-      this.$nextTick(() => {
-        this.$refs.contentView.scrollTop = this.$refs.contentView.scrollHeight;
-      })
-    }
-  },
+  beforeDestroy() {
+    PubSub.unsubscribe(this.pubId)
+  }
 }
 </script>
 
@@ -95,12 +104,12 @@ export default {
     <ul class="chat-list">
       <li class="single-chat-li" v-for="record in chatList" :key="record.id">
         <div class="content">
-          <MarkdownIt class="user-content" :content="record.user" />
+          <MarkdownIt class="user-content" :content="record.user"/>
         </div>
 
         <div class="content">
-          <p class="assistant-model" v-text="record.model" />
-          <MarkdownIt class="assistant-content" :content="record.assistant" />
+          <p class="assistant-model" v-text="record.model"/>
+          <MarkdownIt class="assistant-content" :content="record.assistant"/>
         </div>
       </li>
     </ul>

@@ -1,6 +1,7 @@
 <script>
 import {StreamChatFetch} from '@/assets/js/content';
 import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+import PubSub from 'pubsub-js';
 
 export default {
   name: "ContentInput",
@@ -19,7 +20,7 @@ export default {
 
   methods: {
     ...mapActions('globalInfo', ['setStateInput', 'setStatePending', 'setStateResponding']),
-    ...mapMutations('assistantResp', ['appendUserRequest', 'setResponding', 'closeResponding']),
+    ...mapMutations('assistantResp', ['appendUserRequest', 'closeResponding']),
 
     uploadAttachment() {
       console.log("Upload Attachment");
@@ -81,7 +82,10 @@ export default {
         if (msg.event === 'data') {
           if (data.content && data.content.length > 0) {
             respBuffer += data.content
-            vueModel.setResponding(respBuffer)
+            PubSub.publish('assistant_responding', {
+              content: respBuffer,
+              isEnd: false,
+            })
           }
         } else if (msg.event === 'error') {
           throw new Error(data.content)
@@ -89,6 +93,10 @@ export default {
 
         if (data.isEnd) {
           vueModel.signal.abort()
+          PubSub.publish('assistant_responding', {
+            content: respBuffer,
+            isEnd: true,
+          })
         }
       }
       const onerror = err => {
@@ -116,6 +124,10 @@ export default {
       this.signal.abort();
       this.setStateInput();
     },
+  },
+
+  beforeDestroy() {
+    this.signal.abort()
   },
 
   watch: {

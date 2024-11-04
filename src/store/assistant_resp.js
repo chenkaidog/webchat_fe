@@ -10,9 +10,7 @@ export default {
             model: "文心4",
             user: "嗨",
             assistant: '嗨！你好呀，有什么我可以帮助你的吗？或者我们可以聊聊你感兴趣的话题。\n\n**但是你要先登录账号哦**',
-
         }],
-        responding: ''
     },
     actions: {},
     mutations: {
@@ -24,19 +22,15 @@ export default {
             state.chatList = chatList.filter((item) => {
                 return item.assistant && item.assistant !== '...'
             })
-            state.responding = ''
         },
 
         // 用户成功发起请求后，先记录用户的请求内容
         appendUserRequest: (state, chatItem) => {
             state.chatList.push(chatItem)
-            state.responding = '...'
         },
 
         // 持续记录AI助手的响应
         setResponding(state, responding) {
-            state.responding = responding
-
             const n = state.chatList.length
             if (n > 0) {
                 state.chatList[n - 1].assistant = responding
@@ -45,7 +39,6 @@ export default {
 
         // 结束响应
         closeResponding(state) {
-            state.responding = ''
             storeChatRecord(state.accountId, state.chatId, state.chatList)
         },
 
@@ -53,7 +46,6 @@ export default {
             state.chatList = []
             state.accountId = ''
             state.chatId = ''
-            state.responding = ''
         }
     },
     getters: {}
