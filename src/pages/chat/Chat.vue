@@ -1,7 +1,7 @@
 <script>
 import NavigatorBar from "@/pages/chat/NavigatorBar.vue";
 import MainContent from "@/pages/chat/MainContent.vue";
-import {mapState} from "vuex";
+import {mapActions, mapState} from "vuex";
 
 export default {
   name: "Chat",
@@ -15,19 +15,34 @@ export default {
     appStyle() {
       if (this.navigatorFlag)
         return {
+          // 打开导航栏
           gridTemplateColumns: 'auto 1fr',
         }
       else
         return {
+          // 关闭导航栏
           gridTemplateColumns: '1fr',
         }
     }
   },
+
+  methods: {
+    ...mapActions('globalInfo', ['closeNavigator'])
+  },
+
+  mounted() {
+    this.$nextTick(() => {
+      const div = this.$refs.chatTemplate;
+      if (div.clientWidth < 800) {
+        this.closeNavigator()
+      }
+    });
+  }
 }
 </script>
 
 <template>
-  <div id="chat" :style="appStyle">
+  <div id="chat" :style="appStyle" ref="chatTemplate">
     <NavigatorBar class="navigator" v-show="navigatorFlag"/>
     <MainContent class="main-content"/>
   </div>

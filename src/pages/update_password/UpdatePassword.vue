@@ -1,4 +1,6 @@
 <script>
+import {UpdatePassword, UpdatePasswordFetch} from "@/assets/js/account_info";
+
 export default {
   name: "UpdatePassword",
   props: ['redirect'],
@@ -7,30 +9,57 @@ export default {
       password: '',
       passwordNew: '',
       passwordConfirm: '',
-      tips: ''
+      tips: '',
+      waiting: false,
     }
   },
   methods: {
-    updatePassword() {
+    cancel() {
+      this.$router.back();
+    },
+
+    async updatePassword() {
       if (this.passwordNew !== this.passwordConfirm) {
         this.tips = '两次密码不一致，请重新确认'
+        return
+      }
+      const regex = /^\S{5,64}$/;
+      if (!regex.test(this.passwordNew)) {
+        this.tips = '密码必须8到64位且不包含空格';
         return
       }
       if (this.password === '') {
         this.tips = '请输入当前登录密码'
         return
       }
+      this.waiting = true
 
-      // 重新登录
-      if (this.redirect) {
-        this.$router.push({
-          path: '/login',
-          query: { redirect: this.redirect }
-        });
-      } else {
-        this.$router.push({
-          path: '/login',
-        });
+      try {
+        const body = await UpdatePasswordFetch()
+        if (!body.success) {
+          if (body.code === 20001) {
+            this.tips = '密码错误'
+          } else {
+            this.tips = body.message;
+          }
+          return
+        }
+
+        // 修改成功，重新登录
+        if (this.redirect) {
+          await this.$router.push({
+            path: '/login',
+            query: {redirect: this.redirect}
+          });
+        } else {
+          await this.$router.push({
+            path: '/login',
+          });
+        }
+      } catch (error) {
+        this.tips = error.message
+      } finally {
+        this.waiting = true
       }
     }
   }
@@ -47,7 +76,7 @@ export default {
              viewBox="0 0 24 24">
           <path d="M7 14C5.9 14 5 13.1 5 12S5.9 10 7 10 9 10.9 9 12 8.1 14 7
           14M12.6 10C11.8 7.7 9.6 6 7 6C3.7 6 1 8.7 1 12S3.7
-          18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6Z" />
+          18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6Z"/>
         </svg>
 
         <input
@@ -67,7 +96,7 @@ export default {
           8 7.5 8 9 7.3 9 6.5 8.3 5 7.5 5M7.5 13C9.5 13 11.1 14.2 11.7
           16H21V19H20V22H18V19H16V22H13V19H11.7C11.1 20.8 9.4 22 7.5
           22C5 22 3 20 3 17.5S5 13 7.5 13M7.5 16C6.7 16 6 16.7 6 17.5S6.7
-          19 7.5 19 9 18.3 9 17.5 8.3 16 7.5 16Z" />
+          19 7.5 19 9 18.3 9 17.5 8.3 16 7.5 16Z"/>
         </svg>
 
         <input
@@ -87,7 +116,7 @@ export default {
           8 7.5 8 9 7.3 9 6.5 8.3 5 7.5 5M7.5 13C9.5 13 11.1 14.2 11.7
           16H21V19H20V22H18V19H16V22H13V19H11.7C11.1 20.8 9.4 22 7.5
           22C5 22 3 20 3 17.5S5 13 7.5 13M7.5 16C6.7 16 6 16.7 6 17.5S6.7
-          19 7.5 19 9 18.3 9 17.5 8.3 16 7.5 16Z" />
+          19 7.5 19 9 18.3 9 17.5 8.3 16 7.5 16Z"/>
         </svg>
 
         <input
@@ -103,8 +132,12 @@ export default {
 
 
       <div class="update-row-button">
-        <button @click="updatePassword()">
+        <button @click="updatePassword" :disabled="waiting">
           修改
+        </button>
+
+        <button @click="cancel" :disabled="waiting">
+          取消
         </button>
       </div>
 
@@ -178,7 +211,7 @@ export default {
   width: 100%;
   height: 70px;
   margin: 0;
-  padding: 15px 10px 10px 10px;
+  padding: 15px 0 10px 0;
   display: flex;
   justify-content: center;
 }
@@ -190,6 +223,7 @@ export default {
   border: grey solid 1px;
   cursor: pointer;
   background-color: #f5f5f5;
+  margin: 0 10px;
 }
 
 .update-row-button button:hover {

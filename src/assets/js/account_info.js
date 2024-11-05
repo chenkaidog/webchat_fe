@@ -6,7 +6,6 @@ export function ClearCsrfToken(token) {
     localStorage.setItem('web_chat_csrf_token', null);
 }
 
-
 export function GetCsrfToken() {
     return localStorage.getItem('web_chat_csrf_token') || '';
 }
@@ -87,6 +86,31 @@ export async function GetAccountInfoFetch() {
         }
 
         throw new Error('网络异常，请刷新页面');
+    }
+
+    return await response.json()
+}
+
+export async function UpdatePasswordFetch(password, passwordNew) {
+    const response = fetch('/api/v1/account/update_password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Csrf-Token': GetCsrfToken(),
+        },
+        body: JSON.stringify({
+            password_new: passwordNew,
+            password: password
+        })
+    })
+    if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error('用户未登录')
+        }
+        if (response.status === 429) {
+            throw new Error('请求过于频繁，稍后再重试')
+        }
+        throw new Error('网络异常，请稍后重试');
     }
 
     return await response.json()
