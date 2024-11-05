@@ -1,7 +1,7 @@
 <script>
 import MarkdownIt from '@/pages/chat/content/MarkdownIt'
-import {mapMutations, mapState} from "vuex";
-import {v4 as uuidv4} from "uuid";
+import { mapMutations, mapState } from "vuex";
+import { v4 as uuidv4 } from "uuid";
 import PubSub from "pubsub-js";
 
 export default {
@@ -16,17 +16,12 @@ export default {
   },
 
   computed: {
-    ...mapState('accountInfo', {accountId: state => state.id}),
+    ...mapState('accountInfo', { accountId: state => state.id }),
     ...mapState('assistantResp', ['chatList']),
     ...mapState('modelInfo', ['selectedName']),
 
     currentChatId() {
-      let chatId = this.$route.params.chatId;
-      if (chatId) {
-        return chatId
-      }
-
-      return uuidv4();
+      return this.$route.params.chatId || uuidv4();
     }
   },
 
@@ -39,12 +34,6 @@ export default {
       // 收到用户请求
       this.fixToBottom = true
       this.scrollToBottom()
-      if (this.$route.params.chatId !== this.currentChatId) {
-        this.$router.replace({
-          name: 'chat',
-          params: {chatId: this.currentChatId}
-        })
-      }
     },
   },
 
@@ -54,10 +43,10 @@ export default {
 
     selectRecord(chatId) {
       this.setChatList(
-          {
-            accountId: this.accountId,
-            chatId: chatId
-          }
+        {
+          accountId: this.accountId,
+          chatId: chatId
+        }
       )
       this.scrollToBottom()
     },
@@ -72,10 +61,17 @@ export default {
   created() {
     this.pubId = PubSub.subscribe('assistant_responding', (_, responding) => {
       if (responding.isUserRequest) {
+        if (this.$route.params.chatId !== this.currentChatId) {
+          this.$router.replace({
+            name: 'chat',
+            params: { chatId: this.currentChatId }
+          })
+        }
+
         return this.appendUserRequest({
-              selectedName: this.selectedName,
-              userInput: responding.userInput,
-            }
+          selectedName: this.selectedName,
+          userInput: responding.userInput,
+        }
         )
       }
 
@@ -88,7 +84,7 @@ export default {
             msg: this.chatList[n - 1].assistant
           })
 
-          this.storeResponding()
+          this.storeResponding(this.currentChatId)
         }
 
         return
@@ -114,12 +110,12 @@ export default {
     <ul class="chat-list">
       <li class="single-chat-li" v-for="record in chatList" :key="record.id">
         <div class="content">
-          <MarkdownIt class="user-content" :content="record.user"/>
+          <MarkdownIt class="user-content" :content="record.user" />
         </div>
 
         <div class="content">
-          <p class="assistant-model" v-text="record.model"/>
-          <MarkdownIt class="assistant-content" :content="record.assistant"/>
+          <p class="assistant-model" v-text="record.model" />
+          <MarkdownIt class="assistant-content" :content="record.assistant" />
         </div>
       </li>
     </ul>

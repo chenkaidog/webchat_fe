@@ -4,7 +4,6 @@ export default {
     namespaced: true,
     state: {
         accountId: '',
-        chatId: '',
         chatList: [{
             id: "123",
             model: "文心4",
@@ -17,8 +16,7 @@ export default {
         // 设置当前会话的所有内容
         setChatList: (state, params) => {
             state.accountId = params.accountId
-            state.chatId = params.chatId
-            let chatList = getChatRecord(state.accountId, state.chatId) || []
+            let chatList = getChatRecord(params.accountId, params.chatId) || []
             state.chatList = chatList.filter((item) => {
                 return item.assistant && item.assistant !== '...'
             })
@@ -42,17 +40,16 @@ export default {
             }
         },
 
-        storeResponding(state) {
+        storeResponding(state, chatId) {
             state.chatList = state.chatList.filter((item) => {
                 return item.assistant && item.assistant !== '...'
             })
-            storeChatRecord(state.accountId, state.chatId, state.chatList)
+            storeChatRecord(state.accountId, chatId, state.chatList)
         },
 
         cleanupChatList(state) {
             state.chatList = []
             state.accountId = ''
-            state.chatId = ''
         }
     },
     getters: {}
