@@ -35,7 +35,10 @@ export default {
       this.waiting = true
 
       try {
-        const body = await UpdatePasswordFetch()
+        const body = await UpdatePasswordFetch(
+            this.password,
+            this.passwordNew,
+        )
         if (!body.success) {
           if (body.code === 20001) {
             this.tips = '密码错误'
@@ -59,7 +62,7 @@ export default {
       } catch (error) {
         this.tips = error.message
       } finally {
-        this.waiting = true
+        this.waiting = false
       }
     }
   }
