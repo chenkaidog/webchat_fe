@@ -1,5 +1,6 @@
 <script>
 import {UpdatePassword, UpdatePasswordFetch} from "@/assets/js/account_info";
+import {mapMutations} from "vuex";
 
 export default {
   name: "UpdatePassword",
@@ -14,6 +15,8 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('accountInfo', ['logout']),
+
     cancel() {
       this.$router.back();
     },
@@ -49,6 +52,7 @@ export default {
         }
 
         // 修改成功，重新登录
+        this.logout()
         let pushBody = {
           path: '/login',
           query: {redirect: this.redirect}

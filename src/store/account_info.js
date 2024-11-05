@@ -1,3 +1,5 @@
+import {ClearCsrfToken} from "@/assets/js/account_info";
+
 export default {
     namespaced: true,
     state: {
@@ -16,6 +18,7 @@ export default {
             state.id = ''
             state.name = ''
             state.isLogin = false
+            ClearCsrfToken()
         }
     },
     getters: {}
