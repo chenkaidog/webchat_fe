@@ -48,7 +48,6 @@ export default {
           return
         }
 
-
         // 修改成功，重新登录
         let pushBody = {
           path: '/login',
@@ -57,8 +56,7 @@ export default {
         if (this.redirect) {
           pushBody.query={redirect: this.redirect}
         }
-        this.$router.push(pushBody)
-
+        await this.$router.push(pushBody)
       } catch (error) {
         this.tips = error.message
       } finally {

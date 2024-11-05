@@ -92,25 +92,27 @@ export async function GetAccountInfoFetch() {
 }
 
 export async function UpdatePasswordFetch(password, passwordNew) {
-    const response = fetch('/api/v1/account/update_password', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Csrf-Token': GetCsrfToken(),
-        },
-        body: JSON.stringify({
-            password_new: passwordNew,
-            password: password
+    const response = await fetch(
+        '/api/v1/account/update_password',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Csrf-Token': GetCsrfToken(),
+            },
+            body: JSON.stringify({
+                password_new: passwordNew,
+                password: password
+            })
         })
-    })
     if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error('用户未登录')
-        }
         if (response.status === 429) {
             throw new Error('请求过于频繁，稍后再重试')
         }
-        throw new Error('网络异常，请稍后重试');
+        if (response.status === 403) {
+            throw new Error('请求异常，请一小时后重试')
+        }
+        throw new Error('网络异常，请重试');
     }
 
     return await response.json()
