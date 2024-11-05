@@ -48,17 +48,17 @@ export default {
           return
         }
 
+
         // 修改成功，重新登录
-        if (this.redirect) {
-          await this.$router.push({
-            path: '/login',
-            query: {redirect: this.redirect}
-          });
-        } else {
-          await this.$router.push({
-            path: '/login',
-          });
+        let pushBody = {
+          path: '/login',
+          query: {redirect: this.redirect}
         }
+        if (this.redirect) {
+          pushBody.query={redirect: this.redirect}
+        }
+        this.$router.push(pushBody)
+
       } catch (error) {
         this.tips = error.message
       } finally {
