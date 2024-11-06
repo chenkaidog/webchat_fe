@@ -40,7 +40,6 @@ export function StreamChatFetch(
     model, contents, latestMsg, stopSignal,
     onOpenHandler,
     onMessageHandler,
-    onErrorHandler,
 ) {
     let streamChatReq = parseStreamChatReq(model, contents, latestMsg)
 
@@ -57,7 +56,9 @@ export function StreamChatFetch(
             signal: stopSignal,
             onopen: onOpenHandler,
             onmessage: onMessageHandler,
-            onerror: onErrorHandler
+            onerror(err) {
+                throw err
+            }
         },
     )
 }
