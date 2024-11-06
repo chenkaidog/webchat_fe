@@ -57,7 +57,7 @@ export function StreamChatFetch(
             onopen: onOpenHandler,
             onmessage: onMessageHandler,
             onerror(err) {
-                alert(err.message)
+               console.log(err)
                 throw err
             }
         },

@@ -28,6 +28,12 @@ export default {
 
     onEventSourceOpen(response) {
       if (response.ok) {
+        if (this.isResponding) {
+          // 过滤重试的消息，暂时没找到eventsource为什么会重试
+          this.signal.abort();
+          return
+        }
+
         PubSub.publish('assistant_responding', {
           isUserRequest: true,
           userInput: this.userInput,
