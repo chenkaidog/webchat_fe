@@ -52,7 +52,7 @@ export function StreamChatFetch(
                 'X-Csrf-Token': GetCsrfToken(),
             },
             body: JSON.stringify(streamChatReq),
-
+            openWhenHidden: true,
             signal: stopSignal,
             onopen: onOpenHandler,
             onmessage: onMessageHandler,
