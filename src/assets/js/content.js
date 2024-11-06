@@ -43,6 +43,8 @@ export function StreamChatFetch(
 ) {
     let streamChatReq = parseStreamChatReq(model, contents, latestMsg)
 
+    console.log(streamChatReq)
+
     return fetchEventSource(
         '/api/v1/chat/stream',
         {
