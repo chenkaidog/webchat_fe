@@ -99,7 +99,7 @@ export default {
           18V20H4V18C4,15.79 7.58,14 12,14Z" />
         </svg>
 
-        <input class="user-input" type="text" v-model="username" placeholder="输入账号..." :disabled="waiting">
+        <input class="user-input" type="text" v-model="username" placeholder="输入账号/邮箱..." :disabled="waiting">
       </div>
 
       <div class="login-row-input">
