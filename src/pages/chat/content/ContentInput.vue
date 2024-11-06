@@ -26,10 +26,11 @@ export default {
       console.log("Upload Attachment");
     },
 
-    onEventSourceOpen(response) {
+    async onEventSourceOpen(response) {
       if (response.ok) {
         if (this.isResponding) {
           // 过滤重试的消息，暂时没找到eventsource为什么会重试
+          console.log('event source 重试')
           this.signal.abort();
           return
         }
@@ -43,30 +44,25 @@ export default {
         return
       }
 
-      this.signal.abort();
-      if (400 <= response.status && response.status <= 500) {
+      if (400 <= response.status) {
         if (response.status === 401) {
-          throw new Error('请先登录')
+          throw new Error('请先登录账号')
         }
-        if (response.status === 429) {
-          response.json().then(
-              body => {
-                switch (body.code) {
-                  case 10005:
-                  case 30002:
-                    throw new Error('请求过于频繁，稍后再重试')
-                  case 30003:
-                    throw new Error('平台余额不足，请联系管理员')
-                }
+        if (response.status <= 500) {
+          const body = await response.json()
+          switch (body.code) {
+            case 10005:
+            case 30002:
+              throw new Error('请求过于频繁，稍后再重试')
+            case 30003:
+              throw new Error('平台余额不足，请联系管理员')
+          }
 
-                throw new Error('请求参数或权限异常')
-              }
-          ).catch(error => {
-            alert(error.message)
-          })
+          throw new Error('请求参数或权限异常')
         }
+
+        throw new Error('网络异常，请重试')
       }
-      alert('网络异常，请重试')
     },
 
     async sendMsg() {
