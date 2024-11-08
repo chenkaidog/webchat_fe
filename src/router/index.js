@@ -3,7 +3,7 @@ import Chat from "@/pages/chat/Chat";
 import Login from "@/pages/login/Login";
 import UpdatePassword from "@/pages/update_password/UpdatePassword";
 
-export default new VueRouter({
+const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
     routes: [
@@ -33,7 +33,15 @@ export default new VueRouter({
             name: 'chat',
             path: '/chat/:chatId',
             component: Chat,
-            meta: { title: '首页' }
+            meta: { title: '对话' }
         },
     ]
 })
+
+router.afterEach((to, from) => {
+    if (to.meta.title) {
+        document.title = to.meta.title;
+    }
+});
+
+export default router;

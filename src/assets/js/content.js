@@ -1,5 +1,5 @@
-import {GetCsrfToken} from "./account_info"
-import {fetchEventSource} from '@microsoft/fetch-event-source';
+import { GetCsrfToken } from "./account_info"
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 export async function ModelListFetch() {
     const response = await fetch('/api/v1/model/list', {
